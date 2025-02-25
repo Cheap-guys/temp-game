@@ -34,30 +34,48 @@ public class TapScript : MonoBehaviour
     //     moneyText.text = money.ToString();
     //     creatureAnimator = transform.parent.parent.GetChild(1).GetChild(0).GetChild(0).GetComponent<Animator>();
     // }
-
-    private void OnMouseDown() {
-        creatureAnimator = transform.parent.parent.GetChild(1).GetChild(0).GetChild(0).GetComponent<Animator>();
-
-        if (EventSystem.current.IsPointerOverGameObject())
+    
+    void Update()
+    {
+        #if UNITY_EDITOR || UNITY_STANDALONE
+        if (Input.GetMouseButtonDown(0))
         {
-            return;
+            if (EventSystem.current.IsPointerOverGameObject())
+                return;
+
+            HandleClick();
         }
-
-        int criticalDamage = ATK;
-        int damageColor = 0;
-
-        if(Random.Range(0, 100) < criticalValue)
+        #elif UNITY_ANDROID || UNITY_IOS
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
-            criticalDamage = (int)(ATK * criticalDamageRate);
-            damageColor = 1;
+            if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+                return;
+
+            HandleClick();
         }
-        money += criticalDamage;
-        moneyText.text = money.ToString();
-        mainCharacterAnimator.Play("Atk", -1, 0f);
-        creatureAnimator.Play("Hit", -1, 0f);
-        effect.GetComponent<EffectAnimationHandler>().playEffectAnimation(criticalDamage, damageColor);
-        HPSlider.GetComponent<HPHandleScript>().ReduceHP(criticalDamage);
+        #endif
     }
+
+private void HandleClick()
+{
+    creatureAnimator = transform.parent.parent.GetChild(1).GetChild(0).GetChild(0).GetComponent<Animator>();
+
+    int criticalDamage = ATK;
+    int damageColor = 0;
+
+    if (Random.Range(0, 100) < criticalValue)
+    {
+        criticalDamage = (int)(ATK * criticalDamageRate);
+        damageColor = 1;
+    }
+
+    money += criticalDamage;
+    moneyText.text = money.ToString();
+    mainCharacterAnimator.Play("Atk", -1, 0f);
+    creatureAnimator.Play("Hit", -1, 0f);
+    effect.GetComponent<EffectAnimationHandler>().playEffectAnimation(criticalDamage, damageColor);
+    HPSlider.GetComponent<HPHandleScript>().ReduceHP(criticalDamage);
+}
 
     public int GetMoney()
     {
