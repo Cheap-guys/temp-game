@@ -11,6 +11,8 @@ public class TapScript : MonoBehaviour
     private GameObject effect;
     [SerializeField] private GameObject HPSlider;
     private int ATK;
+    private int criticalValue;
+    private float criticalDamageRate;
     private int money;
     [SerializeField] private TMP_Text moneyText;
 
@@ -18,6 +20,8 @@ public class TapScript : MonoBehaviour
     void Start()
     {
         ATK = 1;
+        criticalValue = 0;
+        criticalDamageRate = 1.1f;
         money = 0;
         mainCharacterAnimator = transform.parent.parent.GetChild(0).GetChild(0).GetComponent<Animator>();
         // creatureAnimator = transform.parent.parent.GetChild(1).GetChild(0).GetChild(0).GetComponent<Animator>();
@@ -39,12 +43,20 @@ public class TapScript : MonoBehaviour
             return;
         }
 
-        money += ATK;
+        int criticalDamage = ATK;
+        int damageColor = 0;
+
+        if(Random.Range(0, 100) < criticalValue)
+        {
+            criticalDamage = (int)(ATK * criticalDamageRate);
+            damageColor = 1;
+        }
+        money += criticalDamage;
         moneyText.text = money.ToString();
         mainCharacterAnimator.Play("Atk", -1, 0f);
         creatureAnimator.Play("Hit", -1, 0f);
-        effect.GetComponent<EffectAnimationHandler>().playEffectAnimation(ATK);
-        HPSlider.GetComponent<HPHandleScript>().ReduceHP(ATK);
+        effect.GetComponent<EffectAnimationHandler>().playEffectAnimation(criticalDamage, damageColor);
+        HPSlider.GetComponent<HPHandleScript>().ReduceHP(criticalDamage);
     }
 
     public int GetMoney()
@@ -66,6 +78,16 @@ public class TapScript : MonoBehaviour
     public void SetATK(int setATK)
     {
         ATK = setATK;
+    }
+
+    public void SetCriticalValue(int criticalValue)
+    {
+        this.criticalValue = criticalValue;
+    }
+
+    public void SetCriticalDamageRate(float criticalDamageRate)
+    {
+        this.criticalDamageRate = criticalDamageRate;
     }
 
     public void PlusMoney(int ATK)

@@ -15,8 +15,17 @@ public class EffectAnimationHandler : MonoBehaviour
         damageText = transform.parent.GetChild(2).GetChild(0).gameObject;
     }
 
-    public void playEffectAnimation(int ATK)
+    public void playEffectAnimation(int ATK, int damageColor)
     {
+        if(damageColor == 1)
+        {
+            damageText.transform.GetComponent<TMP_Text>().color = new Color(0.7f, 0.7f, 0, 1);
+        }
+        else
+        {
+            damageText.transform.GetComponent<TMP_Text>().color = new Color(1, 1, 1, 1);
+        }
+
         damageText.transform.localPosition = new Vector3(0, 0, -1);
         StopAllCoroutines();
         StartCoroutine(MoveToPosition(new Vector3(0, 40, -1)));

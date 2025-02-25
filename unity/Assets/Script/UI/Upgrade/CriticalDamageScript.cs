@@ -8,13 +8,12 @@ using UnityEngine.UI;
 public class CriticalDamageScript : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     public TapScript TapScript;
-    [SerializeField] GameObject friend;
     [SerializeField] private int currentValue;
     private int currentMoney;
     [SerializeField] private int upgradeMoney;
     [SerializeField] private int upgradeValue;
     [SerializeField] private int upgradeMoneyRate;
-    [SerializeField] private float upgradeValueRate;
+    // [SerializeField] private float upgradeValueRate;
     
     private TMP_Text currentValueText;
     private TMP_Text upgradeMoneyText;
@@ -42,14 +41,21 @@ public class CriticalDamageScript : MonoBehaviour, IPointerDownHandler, IPointer
             currentMoney -= upgradeMoney;
             upgradeMoney *= upgradeMoneyRate;
             currentValue += upgradeValue;
-            upgradeValue = (int)(upgradeValue * upgradeValueRate);
+            // upgradeValue = (int)(upgradeValue + upgradeValueRate);
 
             currentValueText.text = currentValue.ToString();
-            upgradeValueText.text = "+" + upgradeValue.ToString() + " ATK";
+            upgradeValueText.text = "+" + upgradeValue.ToString() + " %";
             TapScript.SetMoney(currentMoney);
             upgradeMoneyText.text = upgradeMoney.ToString();
 
-            friend.GetComponent<FriendScript>().SetATK(currentValue);
+            TapScript.SetCriticalValue(currentValue);
+
+            if(currentValue >= 100)
+            {
+                upgradeValueText.text = "완료";
+                upgradeMoneyText.text = "";
+                enabled = false;
+            }
         }
     }
 
